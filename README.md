@@ -9,7 +9,7 @@
 [![Platform](https://img.shields.io/badge/Platform-Windows%2010%20%7C%2011-0078D4?style=flat-square&logo=windows)](https://github.com/aiboqiao6/macdowsOS-Tool)
 [![Language](https://img.shields.io/badge/Language-C%2B%2B20-00599C?style=flat-square&logo=cplusplus)](https://github.com/aiboqiao6/macdowsOS-Tool)
 [![Framework](https://img.shields.io/badge/Framework-Qt%206%20Quick-41CD52?style=flat-square&logo=qt)](https://github.com/aiboqiao6/macdowsOS-Tool)
-[![Release](https://img.shields.io/badge/Release-1.35 RC-F5A623?style=flat-square)](https://github.com/aiboqiao6/macdowsOS-Tool/releases)
+[![Release](https://img.shields.io/badge/Release-1.35RC-F5A623?style=flat-square)](https://github.com/aiboqiao6/macdowsOS-Tool/releases)
 
 [下载发布版](https://github.com/aiboqiao6/macdowsOS-Tool/releases) · [中文文档](README-Chinese.md) · [English Guide](README-English.md) · [问题反馈](https://github.com/aiboqiao6/macdowsOS-Tool/issues)
 
@@ -42,7 +42,7 @@ macdowsOS Tool UI主要基于自动操作技术实现的全自动Windows仿macOS
 ## 使用前必读
 
 > [!WARNING]
-> 部分功能会修改系统文件、主题和资源管理器组件。请先创建系统还原点并备份重要数据。第三方组件可能与特定 Windows 版本不兼容，所有操作风险由使用者自行承担。
+> 部分功能会修改系统文件、主题和资源管理器组件，第三方组件可能与特定 Windows 版本不兼容，如出现系统异常的情况下请立即进入WinRE使用 macdowsOS Tool 创建的还原点还原，所有操作风险由使用者自行承担。
 
 - 必须以管理员身份运行，否则修改系统文件时可能因权限不足而失败。
 - 自动化操作可能被安全软件拦截；请先核对发布来源，不要盲目关闭系统安全防护。
