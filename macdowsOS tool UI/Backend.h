@@ -21,6 +21,7 @@
 #include "Theme_Install_win10.h"
 #include "Theme_Install_win11.h"
 #include "Theme_patch_install.h"
+#include "UpdateChecker.h"
 #include "WindowControl.h"
 #include "WindowsFix.h"
 #include "mydockfinder_Install.h"
@@ -29,9 +30,11 @@
 class Backend : public QObject {
     Q_OBJECT
     Q_PROPERTY(QColor bgColor READ bgColor NOTIFY bgColorChanged)
+    Q_PROPERTY(UpdateChecker* updateChecker READ updateChecker CONSTANT)
 
 public:
-    explicit Backend(QObject* parent = nullptr) : QObject(parent) {}
+    explicit Backend(QObject* parent = nullptr)
+        : QObject(parent), m_updateChecker(this) {}
 
     ~Backend() override {
         if (m_installThread && m_installThread->isRunning())
@@ -39,6 +42,7 @@ public:
     }
 
     QColor bgColor() const { return m_bgColor; }
+    UpdateChecker* updateChecker() { return &m_updateChecker; }
 
     void setBgColor(const QColor& color) {
         if (m_bgColor == color)
@@ -278,6 +282,7 @@ signals:
     void installationFinished(bool success, const QString& errorMessage);
 
 private:
+    UpdateChecker m_updateChecker;
     QColor m_bgColor{236, 240, 245};
     QThread* m_installThread = nullptr;
 };

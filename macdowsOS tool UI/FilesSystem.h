@@ -12,6 +12,7 @@
 #include <fileapi.h>
 #include <fstream>
 #include <filesystem>
+#include <Lmcons.h>
 #include "LogSystem.h"
 
 namespace {
@@ -22,6 +23,31 @@ namespace {
         int r1 = _wsystem(takeownCmd.c_str());
         int r2 = _wsystem(icaclsCmd.c_str());
         return (r1 == 0 && r2 == 0);
+    }
+
+    // 给当前登录用户授予目录的读写权限，供普通权限运行的第三方程序保存配置。
+    // 只作用于传入目录及其子项，不会修改整个磁盘的权限。
+    bool GrantCurrentUserModify(const std::wstring& directoryPath) {
+        if (directoryPath.empty()) return false;
+
+        wchar_t userName[UNLEN + 1]{};
+        DWORD userNameLength = UNLEN + 1;
+        if (!GetUserNameW(userName, &userNameLength)) {
+            ERROR_(L"[文件操作组件]无法获取当前用户名");
+            return false;
+        }
+
+        // 将授权主体整体加引号，避免用户名或权限标记中的特殊字符被 cmd 解释。
+        std::wstring grant = L"\"" + std::wstring(userName) +
+                             L":(OI)(CI)M\"";
+        std::wstring command = L"icacls \"" + directoryPath +
+                               L"\" /grant " + grant + L" /T /C /Q";
+        const int result = _wsystem(command.c_str());
+        if (result != 0) {
+            ERROR_(L"[文件操作组件]授予当前用户配置目录权限失败");
+            return false;
+        }
+        return true;
     }
 // 文件系统命名空间
 namespace fs {

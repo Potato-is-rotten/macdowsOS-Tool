@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 import QtQuick.Window
+import Backend 1.0
 
 Window {
     id: appWindow
@@ -16,6 +17,7 @@ Window {
 
     property var wizardWindow: null
     property var pageMap: [0, 1, 4]
+    property bool startupUpdateCheckPending: true
     readonly property int sidebarWidth: 232
     readonly property int titleBarHeight: 52
 
@@ -112,6 +114,7 @@ Window {
                     }
 
                     NavigationSidebar {
+                        id: navigationSidebar
                         Layout.fillWidth: true
                         Layout.fillHeight: true
                         onNavigationRequested: function(navIndex) {
@@ -187,6 +190,27 @@ Window {
         }
 
     }
+
+    Connections {
+        target: Backend.updateChecker
+
+        function onUpdateStateChanged() {
+            if (!appWindow.startupUpdateCheckPending)
+                return
+
+            const state = Backend.updateChecker.updateState
+            if (state !== "available" && state !== "up-to-date" && state !== "error")
+                return
+
+            appWindow.startupUpdateCheckPending = false
+            if (state === "available") {
+                contentStack.currentIndex = 3
+                navigationSidebar.selectedIndex = 3
+            }
+        }
+    }
+
+    Component.onCompleted: Backend.updateChecker.checkForUpdates()
 
     MouseArea { z:99; anchors.left: parent.left; anchors.top: parent.top; anchors.bottom: parent.bottom; width: 5; cursorShape: Qt.SizeHorCursor; onPressed: appWindow.startSystemResize(Qt.LeftEdge) }
     MouseArea { z:99; anchors.right: parent.right; anchors.top: parent.top; anchors.bottom: parent.bottom; width: 5; cursorShape: Qt.SizeHorCursor; onPressed: appWindow.startSystemResize(Qt.RightEdge) }

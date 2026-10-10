@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
+import Backend 1.0
 
 Item {
     id: root
@@ -81,7 +82,7 @@ Item {
                     spacing: 4
 
                     Label { text: "版本"; color: "#1D1D1F"; font { pixelSize: 14; weight: Font.DemiBold } }
-                    Label { text: "1.35 RC"; color: "#86868B"; font.pixelSize: 12 }
+                    Label { text: Backend.updateChecker.currentVersion; color: "#86868B"; font.pixelSize: 12 }
                 }
 
                 Label {

@@ -154,5 +154,8 @@
     <QtMoc Include="Backend.h">
       <Filter>头文件\be</Filter>
     </QtMoc>
+    <QtMoc Include="UpdateChecker.h">
+      <Filter>头文件\be</Filter>
+    </QtMoc>
   </ItemGroup>
 </Project>

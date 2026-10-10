@@ -8,6 +8,12 @@
 
 #include "LogSystem.h"
 
+// 应用版本信息集中管理。发布新版本时只需要修改这里。
+namespace MacdowsOSBuild {
+inline constexpr char kVersionName[] = "1.40 Beta 1";
+inline constexpr char kVersionTag[] = "20260927140B1";
+}
+
 namespace {
 
 // 静默运行批处理文件

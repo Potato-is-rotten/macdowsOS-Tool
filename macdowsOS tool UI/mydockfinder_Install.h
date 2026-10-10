@@ -86,12 +86,10 @@ void mydockfinder_install() {
     INFO_(L"[mydockfinder安装器]开始安装");
     //文件路径
     INFO_(L"[mydockfinder安装器]获取路径");
-    std::wstring InstallFolder = BrowseFolder(L" 请选择mydockfinder安装目录，不要选C盘");
+    std::wstring InstallFolder = BrowseFolder(L" 请选择 MyDockFinder 安装目录");
     // 检查路径合法性
-    wchar_t driveLetter = towupper(InstallFolder[0]);
-    if (InstallFolder.empty() || driveLetter == L'C') {
-        ERROR_(L"[mydockfinder安装器]目录为空或不可用 重新选择目录");
-        mydockfinder_install();
+    if (InstallFolder.empty()) {
+        ERROR_(L"[mydockfinder安装器]目录为空，取消安装");
         return;
     }
 
@@ -137,6 +135,19 @@ void mydockfinder_install() {
             INFO_(L"[mydockfinder安装器]未检测到原有配置");
             copyPath(L"AppData\\MyDockFinder\\MyDockFinder", InstallFolder);
         }
+
+    std::wstring myDockFolder = InstallFolder;
+    if (myDockFolder.back() == L'\\' || myDockFolder.back() == L'/') {
+        myDockFolder += L"MyDockFinder";
+    } else {
+        myDockFolder += L"\\MyDockFinder";
+    }
+    if (!GrantCurrentUserModify(myDockFolder)) {
+        ERROR_(L"[mydockfinder安装器]配置目录权限设置失败，MyDockFinder可能无法保存设置");
+    } else {
+        INFO_(L"[mydockfinder安装器]已授予当前用户配置目录修改权限");
+    }
+
     INFO_(L"[mydockfinder安装器]设置开机自启动");
     const wchar_t* APP_NAME = L"MyDockFinder";
     std::wstring appPath = InstallFolder + L"\\MyDockFinder\\Dock_64.exe";

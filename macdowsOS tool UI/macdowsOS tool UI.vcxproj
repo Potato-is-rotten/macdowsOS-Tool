@@ -37,12 +37,12 @@
   </ImportGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'" Label="QtSettings">
     <QtInstall>6.11.1_msvc2022_64</QtInstall>
-    <QtModules>quick;quickcontrols2</QtModules>
+    <QtModules>quick;quickcontrols2;network</QtModules>
     <QtBuildConfig>debug</QtBuildConfig>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'" Label="QtSettings">
     <QtInstall>6.11.1_msvc2022_64</QtInstall>
-    <QtModules>quick;quickcontrols2</QtModules>
+    <QtModules>quick;quickcontrols2;network</QtModules>
     <QtBuildConfig>release</QtBuildConfig>
   </PropertyGroup>
   <Target Name="QtMsBuildNotFound" BeforeTargets="CustomBuild;ClCompile" Condition="!Exists('$(QtMsBuild)\qt.targets') or !Exists('$(QtMsBuild)\qt.props')">
@@ -102,6 +102,7 @@
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="Backend.h" />
+    <QtMoc Include="UpdateChecker.h" />
   </ItemGroup>
   <ItemGroup>
     <QtRcc Include="qml.qrc" />

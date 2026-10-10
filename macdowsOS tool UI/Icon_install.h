@@ -95,14 +95,17 @@ void Icon_Install() {
     std::wstring backup1 = L"C:\\Windows\\macdowsOStool\\Icon_backup\\System32";
     std::wstring backup2 = L"C:\\Windows\\macdowsOStool\\Icon_backup\\SysWOW64";
 
-    //备份
-    INFO_(L"[图标安装工具]备份系统原始文件");
-    copyPath(res5, backup1);
-    copyPath(res6, backup1);
+    if (!fs::exists(backup1 + L"\\imageres.dll") && !fs::exists(backup2 + L"\\imageres.dll")) {
+        //备份
+        INFO_(L"[图标安装工具]备份系统原始文件");
+        copyPath(res5, backup1);
+        copyPath(res6, backup1);
 
-    copyPath(res8, backup2);
-    copyPath(res9, backup2);
+        copyPath(res8, backup2);
+        copyPath(res9, backup2);
 
+    }
+    
     //
     INFO_(L"[图标安装工具]关闭文件资源管理器");
     system("taskkill /f /im explorer.exe");
