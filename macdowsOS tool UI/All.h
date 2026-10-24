@@ -37,14 +37,14 @@ void killapp(const std::wstring& appname) {
     HANDLE hSnapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
     if (hSnapshot == INVALID_HANDLE_VALUE) {
         ERROR_(L"[macdowsOS Tool] 创建进程快照时出现错误");
-        MessageBoxW(NULL, L" 终止进程时出现错误 错误1", L" macdowsOS tool 进程管理", MB_OK | MB_ICONERROR);
+        MessageBoxW(NULL, L" 终止进程时出现错误 错误1", L" macdowsOS tool 进程管理", MB_OK | MB_ICONERROR | MB_TOPMOST);
         return;
     }
     PROCESSENTRY32W pe32{};
     pe32.dwSize = sizeof(PROCESSENTRY32W);
     if (!Process32FirstW(hSnapshot, &pe32)) {
         ERROR_(L"[macdowsOS Tool] 进程信息为空");
-        MessageBoxW(NULL, L" 终止进程时出现错误 错误2", L" macdowsOS tool 进程管理", MB_OK | MB_ICONERROR);
+        MessageBoxW(NULL, L" 终止进程时出现错误 错误2", L" macdowsOS tool 进程管理", MB_OK | MB_ICONERROR | MB_TOPMOST);
         CloseHandle(hSnapshot);
         return;
     }
@@ -70,7 +70,7 @@ void AddAutoStart(const std::wstring& targetPath, const std::wstring& shortcutNa
     HRESULT hr = SHGetKnownFolderPath(FOLDERID_Startup, 0, nullptr, &startupPath);
     if (FAILED(hr) || !startupPath) {
         ERROR_(L"[macdowsOS Tool] 添加开机自启动时出现错误 无法获取startup文件夹路径");
-        MessageBoxW(NULL, L" 添加开机自启动时出现错误 错误1", L" macdowsOS tool 进程管理", MB_OK | MB_ICONERROR);
+        MessageBoxW(NULL, L" 添加开机自启动时出现错误 错误1", L" macdowsOS tool 进程管理", MB_OK | MB_ICONERROR | MB_TOPMOST);
         return;
     }
     std::wstring shortcutPath = startupPath;
@@ -83,7 +83,7 @@ void AddAutoStart(const std::wstring& targetPath, const std::wstring& shortcutNa
     hr = CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED);
     if (FAILED(hr) && hr != RPC_E_CHANGED_MODE) {
         ERROR_(L"[macdowsOS Tool] 添加开机自启动时出现错误 无法初始化COM");
-        MessageBoxW(NULL, L" 添加开机自启动时出现错误 错误2", L" macdowsOS tool 进程管理", MB_OK | MB_ICONERROR);
+        MessageBoxW(NULL, L" 添加开机自启动时出现错误 错误2", L" macdowsOS tool 进程管理", MB_OK | MB_ICONERROR | MB_TOPMOST);
         return;
     }
     bool success = false;

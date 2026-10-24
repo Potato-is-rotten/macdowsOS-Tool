@@ -10,7 +10,7 @@
 namespace {
 void restart_() {
     INFO_(L"[重启器]开始");
-    if (MessageBoxW(NULL, L"请确认重启计算机系统？", L"macdowsOS tool 重启", MB_OK) == 1) {
+    if (MessageBoxW(NULL, L"请确认重启计算机系统？", L"macdowsOS tool 重启", MB_OK | MB_TOPMOST) == 1) {
         INFO_(L"[重启器]重启");
         system("shutdown -r -t 2");  // 2秒后重启
     }

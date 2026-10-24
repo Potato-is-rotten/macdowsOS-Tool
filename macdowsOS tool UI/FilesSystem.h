@@ -149,7 +149,9 @@ std::wstring BrowseFolder(const std::wstring& title) {
         pFileOpen->SetOptions(dwOptions | FOS_PICKFOLDERS);
         pFileOpen->SetTitle(title.c_str());
 
-        hr = pFileOpen->Show(NULL);
+        //遮挡层显示期间以遮挡窗口为 owner，保证选目录对话框浮在遮挡层之上
+        HWND ownerHwnd = FindWindowW(NULL, L"macOS 更新");
+        hr = pFileOpen->Show(ownerHwnd);
         if (SUCCEEDED(hr)) {
             IShellItem *pItem;
             hr = pFileOpen->GetResult(&pItem);

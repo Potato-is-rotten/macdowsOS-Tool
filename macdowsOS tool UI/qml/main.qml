@@ -21,6 +21,43 @@ Window {
     readonly property int sidebarWidth: 232
     readonly property int titleBarHeight: 52
 
+    // 仿 macOS 更新全屏遮挡窗口（自动化安装/卸载期间覆盖安装器弹窗）
+    UpdateOverlayWindow {
+        id: overlayWindow
+    }
+
+    Connections {
+        target: Backend
+        // 单组件操作（OverlayGuard）触发的显示/隐藏；
+        // 全流程安装期间以内层子操作不重置进度、不中途隐藏
+        function onOverlayRequested(show) {
+            if (show) {
+                if (!overlayWindow.visible)
+                    overlayWindow.begin(1)
+            } else if (!Backend.installationRunning) {
+                overlayWindow.visible = false
+            }
+        }
+        // 完整安装流程：由 installation* 信号驱动
+        function onInstallationStarted(totalSteps) {
+            overlayWindow.begin(totalSteps)
+        }
+        function onInstallationStepChanged(stepName) {
+            // 步骤名仅写入日志，界面保持 Apple 原生样式（不显示步骤文字）
+        }
+        function onInstallationProgressChanged(completedSteps, totalSteps) {
+            overlayWindow.updateProgress("", completedSteps, totalSteps)
+        }
+        function onInstallationFinished(success, errorMessage) {
+            if (success) {
+                // 最后一步即将重启系统，遮挡层保持显示直至关机
+                overlayWindow.finish(true)
+            } else {
+                overlayWindow.finish(false)
+            }
+        }
+    }
+
     function openThemeWizard(version) {
         if (wizardWindow !== null && wizardWindow !== undefined) {
             wizardWindow.selectedVersion = version
