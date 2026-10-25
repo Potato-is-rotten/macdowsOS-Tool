@@ -35,6 +35,34 @@ Window {
     property bool firstStepPending: true     // 首步未完成前显示"正在准备更新…"
     property var lastStepTime: null
     property bool restarting: false
+    property real displayRatio: 0            // 实际渲染的进度比例（平滑跟随真实进度）
+    property bool fillAnimated: false        // 进度条动画开关：归零重置期间必须关闭
+
+    // 真实步进之间的"蠕动"推进：进度条永不静止，但绝不越过真实进度太多
+    Timer {
+        id: creepTimer
+        interval: 1800
+        repeat: true
+        running: overlayWindow.visible && !overlayWindow.restarting && overlayWindow.totalSteps > 0
+        onTriggered: {
+            const target = overlayWindow.totalSteps > 0
+                ? Math.min(overlayWindow.completedSteps / overlayWindow.totalSteps, 1) : 0
+            const cap = Math.min(target + 0.04, 0.95)
+            if (overlayWindow.displayRatio < cap) {
+                const inc = 0.002 + Math.random() * 0.006
+                overlayWindow.displayRatio = Math.min(overlayWindow.displayRatio + inc, cap)
+            }
+        }
+    }
+
+    // displayRatio 统一走平滑动画（OutCubic 缓动，模拟 macOS 非线性推进）
+    Behavior on displayRatio {
+        enabled: overlayWindow.fillAnimated
+        NumberAnimation {
+            duration: 1200
+            easing.type: Easing.OutCubic
+        }
+    }
 
     function begin(totalSteps_) {
         totalSteps = totalSteps_
@@ -44,7 +72,9 @@ Window {
         restarting = false
         lastStepTime = new Date()
         timeLabel.text = "正在准备更新…"
-        progressFill.width = 0
+        // 窗口展示给用户之前必须完成归零：关动画 → 瞬间置 0 → 再显示窗口
+        fillAnimated = false
+        displayRatio = 0
         visible = true
         requestActivate()
     }
@@ -52,6 +82,12 @@ Window {
     function updateProgress(stepName, completed, total) {
         completedSteps = completed
         totalSteps = total
+        fillAnimated = true
+        if (totalSteps > 0) {
+            const target = Math.min(completedSteps / totalSteps, 1)
+            if (target > displayRatio)
+                displayRatio = target     // 只进不退，平滑动画逼近真实进度
+        }
         if (firstStepPending) {
             firstStepPending = false
         } else if (lastStepTime !== null) {
@@ -61,15 +97,13 @@ Window {
                 : emaStepSeconds * 0.6 + stepSeconds * 0.4
         }
         lastStepTime = new Date()
-        if (totalSteps > 0) {
-            progressFill.width = barTrack.width * Math.min(completedSteps / totalSteps, 1)
-        }
         updateTimeEstimate()
     }
 
     function finish(success) {
         if (success) {
             restarting = true
+            displayRatio = 1              // 收尾：进度条平滑充满
             timeLabel.text = "正在准备重新启动…"
         } else {
             // 失败：隐藏遮挡层，让错误弹窗可见
@@ -121,16 +155,15 @@ Window {
 
                 Rectangle {
                     id: progressFill
-                    width: 0
+                    width: barTrack.width * overlayWindow.displayRatio
                     height: parent.height
                     radius: parent.radius
                     color: "#FFFFFF"
-                    Behavior on width { NumberAnimation { duration: 350; easing.type: Easing.OutCubic } }
                 }
             }
         }
 
-        // 底部预估时间（距底部约 12%）
+        // 底部预估时间（距底部约 12%，小号萍方字体）
         Text {
             id: timeLabel
             anchors.horizontalCenter: parent.horizontalCenter
@@ -138,9 +171,9 @@ Window {
             anchors.bottomMargin: parent.height * 0.12
             text: "正在准备更新…"
             color: "#FFFFFF"
-            opacity: 0.9
-            font.pixelSize: 15
-            font.family: "PingFang SC"
+            opacity: 0.85
+            font.pixelSize: 13
+            font.family: "PingFang SC0"   // pingfang0.ttf 内部注册名（带尾缀 0）
         }
 
         // 全屏吞掉所有鼠标事件，防止穿透到下面的安装器窗口

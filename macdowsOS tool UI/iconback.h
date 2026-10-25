@@ -34,7 +34,7 @@ void Icon_Back() {
         return;
     }
     INFO_(L"[图标还原组件]结束文件资源管理器");
-    system("taskkill /f /im explorer.exe");
+    RunHiddenCommand(L"taskkill /f /im explorer.exe");
     
     INFO_(L"[图标还原组件]获得文件所有权");
     //获取所有权
@@ -63,7 +63,7 @@ void Icon_Back() {
     //
     INFO_(L"[图标还原组件]清缓存");
     ClearIconCache();
-    system("start explorer");
+    RunHiddenCommand(L"start explorer");
     return;
 }
 

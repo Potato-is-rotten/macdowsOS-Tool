@@ -34,7 +34,8 @@ Window {
             if (show) {
                 if (!overlayWindow.visible)
                     overlayWindow.begin(1)
-            } else if (!Backend.installationRunning) {
+            } else if (!Backend.installationRunning && !Backend.restartPending) {
+                // 重启待定时永不隐藏：保持"正在准备重新启动…"直至 Windows 接管
                 overlayWindow.visible = false
             }
         }
@@ -54,6 +55,16 @@ Window {
                 overlayWindow.finish(true)
             } else {
                 overlayWindow.finish(false)
+            }
+        }
+        // 重启待定（安装/卸载流程任一路径）：统一切换到"正在准备重新启动…"终态，
+        // 遮挡层此后永不隐藏，直至 Windows 接管重启
+        function onRestartPendingChanged() {
+            if (Backend.restartPending && overlayWindow.visible
+                    && !overlayWindow.restarting) {
+                overlayWindow.restarting = true
+                overlayWindow.displayRatio = 1
+                overlayWindow.timeLabel.text = "正在准备重新启动…"
             }
         }
     }

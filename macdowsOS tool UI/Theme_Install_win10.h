@@ -6,6 +6,7 @@
 #include <shellapi.h> 
 #include <objbase.h>
 #include"LogSystem.h"
+#include"All.h"
 #include"FilesSystem.h"
 
 namespace {
@@ -15,9 +16,9 @@ namespace {
 // 程序已获得管理员权限，无需提权
 void EnableThemeService_win10() {
     INFO_(L"[主题安装工具]设置主题服务为自动启动");
-    system("sc config Themes start= auto");
+    RunHiddenCommand(L"sc config Themes start= auto");
     INFO_(L"[主题安装工具]尝试启动主题服务（如已运行则自动跳过）");
-    system("sc start Themes");
+    RunHiddenCommand(L"sc start Themes");
     INFO_(L"[主题安装工具]主题服务启用完成");
 }
 // 将主题设置为开机后自动应用

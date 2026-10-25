@@ -16,6 +16,29 @@ inline constexpr char kVersionTag[] = "20261011140b2";
 
 namespace {
 
+// 以完全无窗口方式运行命令行（替代 system/_wsystem）。
+// 安装期间任何控制台闪现（taskkill/sc/DISM 等输出）都会破坏遮挡层体验，
+// 这里统一走 cmd /c + CREATE_NO_WINDOW + SW_HIDE，并等待命令结束保持与
+// system() 相同的同步语义。外层多包一对引号，兼容含引号的命令（如带空格路径）。
+int RunHiddenCommand(const std::wstring& command) {
+    std::wstring cmdLine = L"cmd /c \"" + command + L"\"";
+    STARTUPINFOW si = { sizeof(si) };
+    si.dwFlags = STARTF_USESHOWWINDOW;
+    si.wShowWindow = SW_HIDE;
+    PROCESS_INFORMATION pi;
+    if (!CreateProcessW(NULL, &cmdLine[0], NULL, NULL, FALSE,
+        CREATE_NO_WINDOW, NULL, NULL, &si, &pi)) {
+        ERROR_(L"[macdowsOS Tool] 隐藏执行命令失败: " + command);
+        return -1;
+    }
+    WaitForSingleObject(pi.hProcess, INFINITE);
+    DWORD exitCode = 0;
+    GetExitCodeProcess(pi.hProcess, &exitCode);
+    CloseHandle(pi.hThread);
+    CloseHandle(pi.hProcess);
+    return static_cast<int>(exitCode);
+}
+
 // 静默运行批处理文件
 bool RunBatchSilentlyNative(const std::wstring& batchFilePath) {
     STARTUPINFOW si = { sizeof(si) };

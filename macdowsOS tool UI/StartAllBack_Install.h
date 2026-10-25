@@ -82,15 +82,15 @@ bool StartAllBack_Config(int mode) {
     TurnOffOn(true, hWnd_Window, L"StartAllBack配置器", L"恢复控制面板小程序");
     TurnOffOn(true, hWnd_Window, L"StartAllBack配置器", L"选中背景显示强调色");
     INFO_(L"[StartAllBack配置器]配置完成 重启文件资源管理器");
-    system("taskkill /f /im explorer.exe");
-    system("start explorer");
+    RunHiddenCommand(L"taskkill /f /im explorer.exe");
+    RunHiddenCommand(L"start explorer");
     if (comInit == S_OK) CoUninitialize();
     return true;
 }
 bool StartAllBack_Install(int mode) {
 	INFO_(L"[StartAllBack安装器]开始");
 	INFO_(L"[StartAllBack安装器]开始安装程序");
-	system("start AppData\\StartAllBack\\Install.exe");
+	RunHiddenCommand(L"start AppData\\StartAllBack\\Install.exe");
 
     //等待应用程序
     INFO_(L"[StartAllBack安装器]等待应用程序");

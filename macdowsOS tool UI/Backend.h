@@ -47,6 +47,7 @@ class Backend : public QObject {
     Q_PROPERTY(QColor bgColor READ bgColor NOTIFY bgColorChanged)
     Q_PROPERTY(UpdateChecker* updateChecker READ updateChecker CONSTANT)
     Q_PROPERTY(bool installationRunning READ installationRunning NOTIFY installationRunningChanged)
+    Q_PROPERTY(bool restartPending READ restartPending NOTIFY restartPendingChanged)
 
 public:
     explicit Backend(QObject* parent = nullptr)
@@ -60,6 +61,7 @@ public:
     QColor bgColor() const { return m_bgColor; }
     UpdateChecker* updateChecker() { return &m_updateChecker; }
     bool installationRunning() const { return m_installationRunning; }
+    bool restartPending() const { return m_restartPending; }
 
     //遮挡深度计数：仅 0→1 显示、1→0 隐藏，避免嵌套流程闪烁
     void pushOverlay() {
@@ -204,11 +206,17 @@ public:
 
     Q_INVOKABLE void restart() {
         INFO_(L"[Backend] 重启");
+        m_restartPending = true;
+        emit restartPendingChanged();
         restart_();
     }
 
     Q_INVOKABLE void restartNoNotice() {
         INFO_(L"[Backend] 无提示重启");
+        // 标记重启待定：QML 据此让遮挡层永不自动隐藏，
+        // 保持"正在准备重新启动…"画面直至 Windows 接管重启，实现无缝过渡
+        m_restartPending = true;
+        emit restartPendingChanged();
         restart_nonotice();
     }
 
@@ -333,6 +341,7 @@ signals:
     void installationProgressChanged(int completedSteps, int totalSteps);
     void installationFinished(bool success, const QString& errorMessage);
     void installationRunningChanged();
+    void restartPendingChanged();
     void overlayRequested(bool show);
 
 private:
@@ -341,6 +350,7 @@ private:
     QThread* m_installThread = nullptr;
     int m_overlayDepth = 0;
     bool m_installationRunning = false;
+    bool m_restartPending = false;
 };
 
 // OverlayGuard 成员函数实现（Backend 已完整定义）
